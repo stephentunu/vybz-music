@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Minimize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sidebar } from '@/components/layout/Sidebar';
@@ -7,10 +7,12 @@ import { NowPlaying } from '@/components/player/NowPlaying';
 import { MiniPlayer } from '@/components/player/MiniPlayer';
 import { Equalizer } from '@/components/player/Equalizer';
 import { HomeView } from '@/components/views/HomeView';
+import { SearchView } from '@/components/views/SearchView';
 import { SongList } from '@/components/library/SongList';
 import { usePlayer } from '@/hooks/usePlayer';
-import { mockSongs, mockPlaylists } from '@/data/mockData';
-import { Playlist } from '@/types/music';
+import { mockPlaylists } from '@/data/mockData';
+import { getPopularTracks } from '@/services/jamendoApi';
+import { Playlist, Song } from '@/types/music';
 import { cn } from '@/lib/utils';
 
 const Index = () => {
@@ -19,23 +21,53 @@ const Index = () => {
   const [showEqualizer, setShowEqualizer] = useState(false);
   const [isMiniMode, setIsMiniMode] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
+  const [popularTracks, setPopularTracks] = useState<Song[]>([]);
 
   const player = usePlayer();
+
+  // Load popular tracks on mount
+  useEffect(() => {
+    const loadTracks = async () => {
+      try {
+        const tracks = await getPopularTracks(20);
+        setPopularTracks(tracks);
+        player.setQueue(tracks);
+      } catch (error) {
+        console.error('Failed to load tracks:', error);
+      }
+    };
+    loadTracks();
+  }, []);
 
   const handlePlaylistSelect = (playlist: Playlist) => {
     setSelectedPlaylist(playlist);
     setActiveView(`playlist-${playlist.id}`);
   };
 
+  const handlePlaySong = (song: Song, queue?: Song[]) => {
+    player.playSong(song, queue);
+  };
+
   const renderMainContent = () => {
-    if (activeView === 'home' || activeView === 'search') {
+    if (activeView === 'search') {
+      return (
+        <SearchView
+          onPlaySong={handlePlaySong}
+          onAddToQueue={player.addToQueue}
+          currentSongId={player.currentSong?.id}
+          isPlaying={player.isPlaying}
+        />
+      );
+    }
+
+    if (activeView === 'home') {
       return (
         <HomeView
           playlists={mockPlaylists}
-          recentSongs={mockSongs}
+          recentSongs={popularTracks}
           currentSong={player.currentSong}
           isPlaying={player.isPlaying}
-          onPlaySong={player.playSong}
+          onPlaySong={(song) => handlePlaySong(song, popularTracks)}
           onPlaylistSelect={handlePlaylistSelect}
         />
       );
@@ -47,10 +79,10 @@ const Index = () => {
           <h1 className="text-4xl font-bold mb-8">Your Library</h1>
           <div className="bg-surface-2 rounded-xl overflow-hidden">
             <SongList
-              songs={mockSongs}
+              songs={popularTracks}
               currentSong={player.currentSong}
               isPlaying={player.isPlaying}
-              onPlaySong={player.playSong}
+              onPlaySong={(song) => handlePlaySong(song, popularTracks)}
             />
           </div>
         </div>
@@ -58,7 +90,7 @@ const Index = () => {
     }
 
     if (activeView === 'liked') {
-      const likedSongs = mockSongs.filter((s) => s.liked);
+      const likedSongs = popularTracks.filter((s) => s.liked);
       return (
         <div className="p-8 animate-fade-in">
           <div className="flex items-end gap-6 mb-8">
@@ -78,7 +110,7 @@ const Index = () => {
               songs={likedSongs}
               currentSong={player.currentSong}
               isPlaying={player.isPlaying}
-              onPlaySong={player.playSong}
+              onPlaySong={(song) => handlePlaySong(song, likedSongs)}
             />
           </div>
         </div>
@@ -90,7 +122,7 @@ const Index = () => {
         <div className="p-8 animate-fade-in">
           <div className="flex items-end gap-6 mb-8">
             <img
-              src={selectedPlaylist.coverArt || mockSongs[0].albumArt}
+              src={selectedPlaylist.coverArt || popularTracks[0]?.albumArt}
               alt={selectedPlaylist.name}
               className="w-48 h-48 rounded-lg object-cover shadow-card"
             />
@@ -109,7 +141,7 @@ const Index = () => {
               songs={selectedPlaylist.songs}
               currentSong={player.currentSong}
               isPlaying={player.isPlaying}
-              onPlaySong={player.playSong}
+              onPlaySong={(song) => handlePlaySong(song, selectedPlaylist.songs)}
             />
           </div>
         </div>
@@ -203,7 +235,7 @@ const Index = () => {
             queue={player.queue}
             currentIndex={player.queueIndex}
             currentSong={player.currentSong}
-            onPlaySong={player.playSong}
+            onPlaySong={(song) => handlePlaySong(song)}
             onClose={() => setShowQueue(false)}
           />
         )}

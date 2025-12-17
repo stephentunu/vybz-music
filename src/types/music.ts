@@ -5,6 +5,7 @@ export interface Song {
   album: string;
   duration: number;
   albumArt: string;
+  audioUrl?: string;
   genre?: string;
   year?: number;
   playCount?: number;
