@@ -1,4 +1,4 @@
-import { Home, Search, Library, Heart, PlusCircle, Music2 } from 'lucide-react';
+import { Home, Search, Library, Heart, PlusCircle, Music2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Playlist } from '@/types/music';
@@ -14,6 +14,7 @@ interface SidebarProps {
 const navItems = [
   { id: 'home', icon: Home, label: 'Home' },
   { id: 'search', icon: Search, label: 'Search' },
+  { id: 'my-uploads', icon: Upload, label: 'My Uploads' },
   { id: 'library', icon: Library, label: 'Your Library' },
 ];
 

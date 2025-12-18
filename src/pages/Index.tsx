@@ -8,6 +8,7 @@ import { MiniPlayer } from '@/components/player/MiniPlayer';
 import { Equalizer } from '@/components/player/Equalizer';
 import { HomeView } from '@/components/views/HomeView';
 import { SearchView } from '@/components/views/SearchView';
+import { MyUploadsView } from '@/components/views/MyUploadsView';
 import { SongList } from '@/components/library/SongList';
 import { usePlayer } from '@/hooks/usePlayer';
 import { mockPlaylists } from '@/data/mockData';
@@ -55,6 +56,17 @@ const Index = () => {
           onPlaySong={handlePlaySong}
           onAddToQueue={player.addToQueue}
           currentSongId={player.currentSong?.id}
+          isPlaying={player.isPlaying}
+        />
+      );
+    }
+
+    if (activeView === 'my-uploads') {
+      return (
+        <MyUploadsView
+          onPlaySong={handlePlaySong}
+          onAddToQueue={player.addToQueue}
+          currentSong={player.currentSong}
           isPlaying={player.isPlaying}
         />
       );
