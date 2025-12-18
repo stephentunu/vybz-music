@@ -17,6 +17,7 @@ interface SearchViewProps {
 const GENRES = [
   'afro', 
   'bongo flava', 
+  'swahili',
   'african', 
   'reggae', 
   'gospel',

@@ -51,6 +51,7 @@ serve(async (req) => {
         'world': 'world+ethnic',
         'gospel': 'gospel+spiritual+christian',
         'rhumba': 'rumba+latin+african',
+        'swahili': 'african+world+dance+ethnic',
       };
       
       const jamendoGenre = genreMapping[genre.toLowerCase()] || genre.toLowerCase();
