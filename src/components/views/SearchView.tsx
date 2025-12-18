@@ -14,7 +14,22 @@ interface SearchViewProps {
   isPlaying: boolean;
 }
 
-const GENRES = ['rock', 'electronic', 'jazz', 'classical', 'hiphop', 'pop', 'ambient', 'folk'];
+const GENRES = [
+  'afro', 
+  'bongo flava', 
+  'african', 
+  'reggae', 
+  'pop', 
+  'hiphop', 
+  'rock', 
+  'electronic', 
+  'jazz', 
+  'r&b', 
+  'latin', 
+  'folk',
+  'blues',
+  'country'
+];
 
 export const SearchView = ({ onPlaySong, onAddToQueue, currentSongId, isPlaying }: SearchViewProps) => {
   const [searchResults, setSearchResults] = useState<Song[]>([]);
