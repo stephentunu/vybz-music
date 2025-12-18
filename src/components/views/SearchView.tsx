@@ -112,7 +112,7 @@ export const SearchView = ({ onPlaySong, onAddToQueue, currentSongId, isPlaying 
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Search</h1>
-          <p className="text-muted-foreground">Find free music from Jamendo</p>
+          <p className="text-muted-foreground">Enjoy your favorite music from Tunu's App</p>
         </div>
 
         <div className="mb-8">
