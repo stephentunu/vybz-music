@@ -19,6 +19,8 @@ const GENRES = [
   'bongo flava', 
   'african', 
   'reggae', 
+  'gospel',
+  'rhumba',
   'pop', 
   'hiphop', 
   'rock', 
