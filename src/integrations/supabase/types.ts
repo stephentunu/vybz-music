@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      uploaded_songs: {
+        Row: {
+          album: string | null
+          album_art_url: string | null
+          artist: string
+          audio_url: string
+          created_at: string
+          duration: number | null
+          genre: string | null
+          id: string
+          session_id: string
+          title: string
+        }
+        Insert: {
+          album?: string | null
+          album_art_url?: string | null
+          artist: string
+          audio_url: string
+          created_at?: string
+          duration?: number | null
+          genre?: string | null
+          id?: string
+          session_id: string
+          title: string
+        }
+        Update: {
+          album?: string | null
+          album_art_url?: string | null
+          artist?: string
+          audio_url?: string
+          created_at?: string
+          duration?: number | null
+          genre?: string | null
+          id?: string
+          session_id?: string
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
