@@ -31,26 +31,28 @@ serve(async (req) => {
       const genreMapping: Record<string, string> = {
         'rock': 'rock',
         'pop': 'pop',
-        'electronic': 'electronic',
+        'electronic': 'electronic+dance',
         'jazz': 'jazz',
         'classical': 'classical',
         'hip-hop': 'hiphop',
-        'ambient': 'ambient',
+        'hiphop': 'hiphop',
+        'ambient': 'ambient+chillout',
         'indie': 'indie',
-        'afro': 'african+world',
-        'bongo flava': 'african+world',
+        'afro': 'african+world+tribal',
+        'bongo flava': 'african+world+dance',
         'african': 'african+world',
-        'reggae': 'reggae',
+        'reggae': 'reggae+dub',
         'country': 'country',
-        'folk': 'folk',
-        'metal': 'metal',
+        'folk': 'folk+acoustic',
+        'metal': 'metal+rock',
         'blues': 'blues',
-        'r&b': 'rnb',
-        'latin': 'latin',
+        'r&b': 'rnb+soul',
+        'latin': 'latin+salsa',
+        'world': 'world+ethnic',
       };
       
       const jamendoGenre = genreMapping[genre.toLowerCase()] || genre.toLowerCase();
-      apiUrl = `${JAMENDO_API_BASE}/tracks/?client_id=${clientId}&format=json&limit=${limit}&tags=${encodeURIComponent(jamendoGenre)}&include=musicinfo&audioformat=mp32&boost=popularity_total`;
+      apiUrl = `${JAMENDO_API_BASE}/tracks/?client_id=${clientId}&format=json&limit=${limit}&tags=${encodeURIComponent(jamendoGenre)}&include=musicinfo&audioformat=mp32&boost=popularity_total&groupby=artist_id`;
     } else if (action === 'popular') {
       apiUrl = `${JAMENDO_API_BASE}/tracks/?client_id=${clientId}&format=json&limit=${limit}&order=popularity_total&include=musicinfo&audioformat=mp32`;
     } else {
