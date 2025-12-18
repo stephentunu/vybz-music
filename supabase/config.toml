@@ -1,0 +1,4 @@
+project_id = "nviatjupoisqypsehzgo"
+
+[functions.jamendo-proxy]
+verify_jwt = false
