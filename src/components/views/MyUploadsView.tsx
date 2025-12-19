@@ -84,39 +84,40 @@ export const MyUploadsView = ({ onPlaySong, onAddToQueue, currentSong, isPlaying
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 md:p-6 space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">My Uploads</h1>
-          <p className="text-muted-foreground mt-1">Your personal music collection</p>
+          <h1 className="text-2xl md:text-3xl font-bold">My Uploads</h1>
+          <p className="text-sm md:text-base text-muted-foreground mt-1">Your personal music collection</p>
         </div>
         <UploadSongDialog onUploadComplete={fetchSongs} />
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="flex items-center justify-center py-16 md:py-20">
+          <Loader2 className="h-6 w-6 md:h-8 md:w-8 animate-spin text-primary" />
         </div>
       ) : songs.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Music className="h-16 w-16 text-muted-foreground mb-4" />
-          <h2 className="text-xl font-semibold mb-2">No uploads yet</h2>
-          <p className="text-muted-foreground mb-4">Upload your first song to start your collection</p>
+        <div className="flex flex-col items-center justify-center py-16 md:py-20 text-center px-4">
+          <Music className="h-12 w-12 md:h-16 md:w-16 text-muted-foreground mb-4" />
+          <h2 className="text-lg md:text-xl font-semibold mb-2">No uploads yet</h2>
+          <p className="text-sm md:text-base text-muted-foreground mb-4">Upload your first song to start your collection</p>
           <UploadSongDialog onUploadComplete={fetchSongs} />
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1 md:space-y-2">
           {songs.map((song, index) => {
             const isCurrentSong = currentSong?.id === song.id;
             
             return (
               <div
                 key={song.id}
-                className={`flex items-center gap-4 p-3 rounded-lg hover:bg-accent/50 transition-colors group ${
+                className={`flex items-center gap-3 md:gap-4 p-2 md:p-3 rounded-lg hover:bg-accent/50 transition-colors group ${
                   isCurrentSong ? 'bg-accent' : ''
                 }`}
               >
-                <div className="relative w-12 h-12 flex-shrink-0">
+                {/* Album art with play button */}
+                <div className="relative w-10 h-10 md:w-12 md:h-12 flex-shrink-0">
                   <img
                     src={song.albumArt}
                     alt={song.album}
@@ -125,36 +126,40 @@ export const MyUploadsView = ({ onPlaySong, onAddToQueue, currentSong, isPlaying
                   <Button
                     size="icon"
                     variant="secondary"
-                    className="absolute inset-0 m-auto w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute inset-0 m-auto w-6 h-6 md:w-8 md:h-8 opacity-0 group-hover:opacity-100 transition-opacity"
                     onClick={() => onPlaySong(song, songs)}
                   >
                     {isCurrentSong && isPlaying ? (
-                      <Pause className="h-4 w-4" />
+                      <Pause className="h-3 w-3 md:h-4 md:w-4" />
                     ) : (
-                      <Play className="h-4 w-4" />
+                      <Play className="h-3 w-3 md:h-4 md:w-4" />
                     )}
                   </Button>
                 </div>
 
+                {/* Song info */}
                 <div className="flex-1 min-w-0">
-                  <p className={`font-medium truncate ${isCurrentSong ? 'text-primary' : ''}`}>
+                  <p className={`font-medium text-sm md:text-base truncate ${isCurrentSong ? 'text-primary' : ''}`}>
                     {song.title}
                   </p>
-                  <p className="text-sm text-muted-foreground truncate">{song.artist}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground truncate">{song.artist}</p>
                 </div>
 
-                <div className="hidden md:block text-sm text-muted-foreground">
+                {/* Album - hidden on mobile */}
+                <div className="hidden md:block text-sm text-muted-foreground truncate max-w-[150px]">
                   {song.album}
                 </div>
 
-                <div className="text-sm text-muted-foreground">
+                {/* Duration */}
+                <div className="text-xs md:text-sm text-muted-foreground flex-shrink-0">
                   {formatDuration(song.duration)}
                 </div>
 
+                {/* Delete button */}
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive flex-shrink-0"
                   onClick={() => handleDelete(song.id)}
                 >
                   <Trash2 className="h-4 w-4" />

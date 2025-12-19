@@ -2,15 +2,18 @@ import { useState, useEffect } from 'react';
 import { Minimize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { MobileNav } from '@/components/layout/MobileNav';
 import { QueuePanel } from '@/components/layout/QueuePanel';
 import { NowPlaying } from '@/components/player/NowPlaying';
 import { MiniPlayer } from '@/components/player/MiniPlayer';
+import { MobilePlayer } from '@/components/player/MobilePlayer';
 import { Equalizer } from '@/components/player/Equalizer';
 import { HomeView } from '@/components/views/HomeView';
 import { SearchView } from '@/components/views/SearchView';
 import { MyUploadsView } from '@/components/views/MyUploadsView';
 import { SongList } from '@/components/library/SongList';
 import { usePlayer } from '@/hooks/usePlayer';
+import { useIsMobile, useIsTablet } from '@/hooks/use-mobile';
 import { mockPlaylists } from '@/data/mockData';
 import { getPopularTracks } from '@/services/jamendoApi';
 import { Playlist, Song } from '@/types/music';
@@ -25,6 +28,8 @@ const Index = () => {
   const [popularTracks, setPopularTracks] = useState<Song[]>([]);
 
   const player = usePlayer();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
 
   // Load popular tracks on mount
   useEffect(() => {
@@ -87,8 +92,8 @@ const Index = () => {
 
     if (activeView === 'library') {
       return (
-        <div className="p-8 animate-fade-in">
-          <h1 className="text-4xl font-bold mb-8">Your Library</h1>
+        <div className="p-4 md:p-8 animate-fade-in">
+          <h1 className="text-2xl md:text-4xl font-bold mb-6 md:mb-8">Your Library</h1>
           <div className="bg-surface-2 rounded-xl overflow-hidden">
             <SongList
               songs={popularTracks}
@@ -104,16 +109,16 @@ const Index = () => {
     if (activeView === 'liked') {
       const likedSongs = popularTracks.filter((s) => s.liked);
       return (
-        <div className="p-8 animate-fade-in">
-          <div className="flex items-end gap-6 mb-8">
-            <div className="w-48 h-48 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-glow">
-              <span className="text-6xl">❤️</span>
+        <div className="p-4 md:p-8 animate-fade-in">
+          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6 mb-6 md:mb-8">
+            <div className="w-32 h-32 md:w-48 md:h-48 mx-auto md:mx-0 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-glow">
+              <span className="text-4xl md:text-6xl">❤️</span>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground uppercase tracking-wider mb-2">
+            <div className="text-center md:text-left">
+              <p className="text-xs md:text-sm text-muted-foreground uppercase tracking-wider mb-1 md:mb-2">
                 Playlist
               </p>
-              <h1 className="text-5xl font-bold mb-4">Liked Songs</h1>
+              <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-4">Liked Songs</h1>
               <p className="text-muted-foreground">{likedSongs.length} songs</p>
             </div>
           </div>
@@ -131,18 +136,18 @@ const Index = () => {
 
     if (selectedPlaylist) {
       return (
-        <div className="p-8 animate-fade-in">
-          <div className="flex items-end gap-6 mb-8">
+        <div className="p-4 md:p-8 animate-fade-in">
+          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6 mb-6 md:mb-8">
             <img
               src={selectedPlaylist.coverArt || popularTracks[0]?.albumArt}
               alt={selectedPlaylist.name}
-              className="w-48 h-48 rounded-lg object-cover shadow-card"
+              className="w-32 h-32 md:w-48 md:h-48 mx-auto md:mx-0 rounded-lg object-cover shadow-card"
             />
-            <div>
-              <p className="text-sm text-muted-foreground uppercase tracking-wider mb-2">
+            <div className="text-center md:text-left">
+              <p className="text-xs md:text-sm text-muted-foreground uppercase tracking-wider mb-1 md:mb-2">
                 Playlist
               </p>
-              <h1 className="text-5xl font-bold mb-4">{selectedPlaylist.name}</h1>
+              <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-4">{selectedPlaylist.name}</h1>
               <p className="text-muted-foreground">
                 {selectedPlaylist.description} • {selectedPlaylist.songs.length} songs
               </p>
@@ -163,7 +168,8 @@ const Index = () => {
     return null;
   };
 
-  if (isMiniMode) {
+  // Desktop mini mode
+  if (isMiniMode && !isMobile) {
     return (
       <MiniPlayer
         song={player.currentSong}
@@ -180,7 +186,7 @@ const Index = () => {
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      {/* Sidebar */}
+      {/* Sidebar - hidden on mobile, shown on tablet/desktop */}
       <Sidebar
         playlists={mockPlaylists}
         activeView={activeView}
@@ -189,60 +195,66 @@ const Index = () => {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
         {/* Content */}
-        <main className="flex-1 overflow-auto">
+        <main className={cn(
+          "flex-1 overflow-auto",
+          // Add padding for mobile menu button and bottom player/nav
+          isMobile && "pt-16 pb-36"
+        )}>
           {renderMainContent()}
         </main>
 
-        {/* Now Playing Panel */}
-        <div className={cn(
-          'w-96 bg-gradient-player flex flex-col border-l border-border transition-all duration-300',
-          'hidden lg:flex'
-        )}>
-          <div className="flex items-center justify-end p-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground"
-              onClick={() => setIsMiniMode(true)}
-            >
-              <Minimize2 className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="flex-1 overflow-auto">
-            <NowPlaying
-              song={player.currentSong}
-              isPlaying={player.isPlaying}
-              shuffle={player.shuffle}
-              repeat={player.repeat}
-              progress={player.progress}
-              duration={player.duration}
-              volume={player.volume}
-              onTogglePlay={player.togglePlay}
-              onPlayNext={player.playNext}
-              onPlayPrevious={player.playPrevious}
-              onToggleShuffle={player.toggleShuffle}
-              onToggleRepeat={player.toggleRepeat}
-              onSeek={player.seek}
-              onVolumeChange={player.setVolume}
-              onToggleQueue={() => setShowQueue(!showQueue)}
-              onToggleEqualizer={() => setShowEqualizer(!showEqualizer)}
-              showEqualizer={showEqualizer}
-            />
+        {/* Now Playing Panel - Desktop only */}
+        {!isMobile && !isTablet && (
+          <div className={cn(
+            'w-80 xl:w-96 bg-gradient-player flex flex-col border-l border-border transition-all duration-300',
+            'hidden lg:flex'
+          )}>
+            <div className="flex items-center justify-end p-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground"
+                onClick={() => setIsMiniMode(true)}
+              >
+                <Minimize2 className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="flex-1 overflow-auto">
+              <NowPlaying
+                song={player.currentSong}
+                isPlaying={player.isPlaying}
+                shuffle={player.shuffle}
+                repeat={player.repeat}
+                progress={player.progress}
+                duration={player.duration}
+                volume={player.volume}
+                onTogglePlay={player.togglePlay}
+                onPlayNext={player.playNext}
+                onPlayPrevious={player.playPrevious}
+                onToggleShuffle={player.toggleShuffle}
+                onToggleRepeat={player.toggleRepeat}
+                onSeek={player.seek}
+                onVolumeChange={player.setVolume}
+                onToggleQueue={() => setShowQueue(!showQueue)}
+                onToggleEqualizer={() => setShowEqualizer(!showEqualizer)}
+                showEqualizer={showEqualizer}
+              />
 
-            {/* Equalizer */}
-            {showEqualizer && (
-              <div className="px-8 pb-8">
-                <Equalizer />
-              </div>
-            )}
+              {/* Equalizer */}
+              {showEqualizer && (
+                <div className="px-8 pb-8">
+                  <Equalizer />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Queue Panel */}
-        {showQueue && (
+        {/* Queue Panel - Desktop/Tablet */}
+        {showQueue && !isMobile && (
           <QueuePanel
             queue={player.queue}
             currentIndex={player.queueIndex}
@@ -252,6 +264,34 @@ const Index = () => {
           />
         )}
       </div>
+
+      {/* Mobile Player */}
+      {isMobile && (
+        <MobilePlayer
+          song={player.currentSong}
+          isPlaying={player.isPlaying}
+          shuffle={player.shuffle}
+          repeat={player.repeat}
+          progress={player.progress}
+          duration={player.duration}
+          volume={player.volume}
+          onTogglePlay={player.togglePlay}
+          onPlayNext={player.playNext}
+          onPlayPrevious={player.playPrevious}
+          onToggleShuffle={player.toggleShuffle}
+          onToggleRepeat={player.toggleRepeat}
+          onSeek={player.seek}
+          onVolumeChange={player.setVolume}
+        />
+      )}
+
+      {/* Mobile Navigation */}
+      {isMobile && (
+        <MobileNav
+          activeView={activeView}
+          onViewChange={setActiveView}
+        />
+      )}
     </div>
   );
 };

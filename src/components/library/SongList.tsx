@@ -1,4 +1,4 @@
-import { Play, Heart, MoreHorizontal, Clock } from 'lucide-react';
+import { Play, Heart, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Song } from '@/types/music';
 import { formatDuration } from '@/data/mockData';
@@ -14,11 +14,11 @@ interface SongListProps {
 export const SongList = ({ songs, currentSong, isPlaying, onPlaySong }: SongListProps) => {
   return (
     <div className="w-full">
-      {/* Header */}
-      <div className="grid grid-cols-[auto_1fr_1fr_auto_auto] gap-4 px-4 py-2 text-sm text-muted-foreground border-b border-border/50">
+      {/* Header - Hidden on mobile */}
+      <div className="hidden md:grid grid-cols-[auto_1fr_1fr_auto_auto] gap-4 px-4 py-2 text-sm text-muted-foreground border-b border-border/50">
         <span className="w-8">#</span>
         <span>Title</span>
-        <span className="hidden md:block">Album</span>
+        <span>Album</span>
         <span className="w-8"><Clock className="h-4 w-4" /></span>
         <span className="w-8"></span>
       </div>
@@ -32,14 +32,14 @@ export const SongList = ({ songs, currentSong, isPlaying, onPlaySong }: SongList
             <div
               key={song.id}
               className={cn(
-                'grid grid-cols-[auto_1fr_1fr_auto_auto] gap-4 px-4 py-3 items-center group cursor-pointer transition-colors',
+                'flex md:grid md:grid-cols-[auto_1fr_1fr_auto_auto] gap-3 md:gap-4 px-3 md:px-4 py-2 md:py-3 items-center group cursor-pointer transition-colors',
                 'hover:bg-surface-hover',
                 isCurrent && 'bg-surface-3'
               )}
               onClick={() => onPlaySong(song)}
             >
-              {/* Index / Play */}
-              <div className="w-8 flex items-center justify-center">
+              {/* Index / Play - Hidden on mobile */}
+              <div className="hidden md:flex w-8 items-center justify-center">
                 <span className={cn(
                   'text-sm text-muted-foreground group-hover:hidden',
                   isCurrent && 'text-primary'
@@ -68,39 +68,51 @@ export const SongList = ({ songs, currentSong, isPlaying, onPlaySong }: SongList
               </div>
 
               {/* Title & Artist */}
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-3">
-                  <img
-                    src={song.albumArt}
-                    alt={song.album}
-                    className="w-10 h-10 rounded object-cover"
-                  />
-                  <div className="min-w-0">
+                  <div className="relative flex-shrink-0">
+                    <img
+                      src={song.albumArt}
+                      alt={song.album}
+                      className="w-10 h-10 rounded object-cover"
+                    />
+                    {/* Mobile play indicator */}
+                    {isCurrent && isPlaying && (
+                      <div className="md:hidden absolute inset-0 flex items-center justify-center bg-black/40 rounded">
+                        <div className="flex gap-0.5">
+                          <div className="w-0.5 h-3 bg-white animate-visualizer" style={{ animationDelay: '0ms' }} />
+                          <div className="w-0.5 h-3 bg-white animate-visualizer" style={{ animationDelay: '150ms' }} />
+                          <div className="w-0.5 h-3 bg-white animate-visualizer" style={{ animationDelay: '300ms' }} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
                     <p className={cn(
-                      'font-medium truncate',
+                      'font-medium text-sm md:text-base truncate',
                       isCurrent && 'text-primary'
                     )}>
                       {song.title}
                     </p>
-                    <p className="text-sm text-muted-foreground truncate">
+                    <p className="text-xs md:text-sm text-muted-foreground truncate">
                       {song.artist}
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Album */}
-              <span className="text-sm text-muted-foreground truncate hidden md:block">
+              {/* Album - Hidden on mobile */}
+              <span className="hidden md:block text-sm text-muted-foreground truncate">
                 {song.album}
               </span>
 
               {/* Duration */}
-              <span className="text-sm text-muted-foreground w-8">
+              <span className="text-xs md:text-sm text-muted-foreground w-auto md:w-8 flex-shrink-0">
                 {formatDuration(song.duration)}
               </span>
 
-              {/* Actions */}
-              <div className="w-8 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              {/* Actions - Hidden on mobile */}
+              <div className="hidden md:flex w-8 items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Button
                   variant="ghost"
                   size="icon"
