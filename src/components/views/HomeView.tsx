@@ -30,34 +30,34 @@ export const HomeView = ({
   };
 
   return (
-    <div className="p-8 animate-fade-in">
+    <div className="p-4 md:p-6 lg:p-8 animate-fade-in">
       {/* Greeting */}
-      <h1 className="text-4xl font-bold mb-8">{greeting()}</h1>
+      <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 md:mb-8">{greeting()}</h1>
 
       {/* Quick Play Cards */}
-      <section className="mb-10">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <section className="mb-8 md:mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
           {playlists.slice(0, 6).map((playlist) => (
             <div
               key={playlist.id}
-              className="flex items-center gap-4 bg-surface-2 hover:bg-surface-3 rounded-md overflow-hidden cursor-pointer group transition-colors"
+              className="flex items-center gap-3 md:gap-4 bg-surface-2 hover:bg-surface-3 rounded-md overflow-hidden cursor-pointer group transition-colors"
               onClick={() => onPlaylistSelect(playlist)}
             >
               <img
                 src={playlist.coverArt || mockSongs[0].albumArt}
                 alt={playlist.name}
-                className="w-16 h-16 object-cover"
+                className="w-12 h-12 md:w-16 md:h-16 object-cover flex-shrink-0"
               />
-              <span className="font-semibold flex-1 truncate pr-4">{playlist.name}</span>
+              <span className="font-medium md:font-semibold text-sm md:text-base flex-1 truncate pr-2">{playlist.name}</span>
               <Button
                 size="icon"
-                className="h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-glow opacity-0 group-hover:opacity-100 mr-4 transition-opacity"
+                className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary text-primary-foreground shadow-glow opacity-0 group-hover:opacity-100 mr-2 md:mr-4 transition-opacity flex-shrink-0"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (playlist.songs[0]) onPlaySong(playlist.songs[0]);
                 }}
               >
-                <Play className="h-4 w-4 ml-0.5" fill="currentColor" />
+                <Play className="h-3 w-3 md:h-4 md:w-4 ml-0.5" fill="currentColor" />
               </Button>
             </div>
           ))}
@@ -65,16 +65,16 @@ export const HomeView = ({
       </section>
 
       {/* Recently Played */}
-      <section className="mb-10">
-        <h2 className="text-2xl font-bold mb-4">Recently Played</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <section className="mb-8 md:mb-10">
+        <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Recently Played</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
           {recentSongs.slice(0, 5).map((song) => (
             <div
               key={song.id}
-              className="group p-4 bg-surface-2 rounded-xl hover:bg-surface-3 transition-all duration-300 cursor-pointer"
+              className="group p-3 md:p-4 bg-surface-2 rounded-xl hover:bg-surface-3 transition-all duration-300 cursor-pointer"
               onClick={() => onPlaySong(song)}
             >
-              <div className="relative mb-4">
+              <div className="relative mb-3 md:mb-4">
                 <img
                   src={song.albumArt}
                   alt={song.album}
@@ -82,22 +82,22 @@ export const HomeView = ({
                 />
                 <Button
                   size="icon"
-                  className="absolute bottom-2 right-2 h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-glow opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all"
+                  className="absolute bottom-1 right-1 md:bottom-2 md:right-2 h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary text-primary-foreground shadow-glow opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all"
                 >
-                  <Play className="h-4 w-4 ml-0.5" fill="currentColor" />
+                  <Play className="h-3 w-3 md:h-4 md:w-4 ml-0.5" fill="currentColor" />
                 </Button>
               </div>
-              <h3 className="font-semibold truncate">{song.title}</h3>
-              <p className="text-sm text-muted-foreground truncate">{song.artist}</p>
+              <h3 className="font-medium md:font-semibold text-sm md:text-base truncate">{song.title}</h3>
+              <p className="text-xs md:text-sm text-muted-foreground truncate">{song.artist}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Made For You */}
-      <section className="mb-10">
-        <h2 className="text-2xl font-bold mb-4">Made For You</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <section className="mb-8 md:mb-10">
+        <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Made For You</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {playlists.map((playlist) => (
             <PlaylistCard
               key={playlist.id}
@@ -110,7 +110,7 @@ export const HomeView = ({
 
       {/* All Songs */}
       <section>
-        <h2 className="text-2xl font-bold mb-4">All Songs</h2>
+        <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">All Songs</h2>
         <div className="bg-surface-2 rounded-xl overflow-hidden">
           <SongList
             songs={recentSongs}

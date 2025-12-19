@@ -20,17 +20,18 @@ export const SearchResults = ({
 }: SearchResultsProps) => {
   if (results.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-        <Music className="w-16 h-16 mb-4 opacity-50" />
-        <p className="text-lg">No results found</p>
-        <p className="text-sm">Try searching for something else</p>
+      <div className="flex flex-col items-center justify-center py-12 md:py-16 text-muted-foreground">
+        <Music className="w-12 h-12 md:w-16 md:h-16 mb-4 opacity-50" />
+        <p className="text-base md:text-lg">No results found</p>
+        <p className="text-xs md:text-sm">Try searching for something else</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-1">
-      <div className="grid grid-cols-[auto_1fr_1fr_auto_auto] gap-4 px-4 py-2 text-xs text-muted-foreground uppercase tracking-wider border-b border-border/50">
+      {/* Header - Hidden on mobile */}
+      <div className="hidden md:grid grid-cols-[auto_1fr_1fr_auto_auto] gap-4 px-4 py-2 text-xs text-muted-foreground uppercase tracking-wider border-b border-border/50">
         <span className="w-10">#</span>
         <span>Title</span>
         <span>Album</span>
@@ -44,11 +45,12 @@ export const SearchResults = ({
         return (
           <div
             key={song.id}
-            className={`group grid grid-cols-[auto_1fr_1fr_auto_auto] gap-4 px-4 py-3 rounded-lg transition-colors hover:bg-surface-2 ${
+            className={`group flex md:grid md:grid-cols-[auto_1fr_1fr_auto_auto] items-center gap-3 md:gap-4 px-3 md:px-4 py-2 md:py-3 rounded-lg transition-colors hover:bg-surface-2 ${
               isCurrentSong ? 'bg-player-accent/10' : ''
             }`}
           >
-            <div className="w-10 flex items-center justify-center">
+            {/* Index/Play indicator - Hidden on mobile */}
+            <div className="hidden md:flex w-10 items-center justify-center">
               {isCurrentSong && isPlaying ? (
                 <div className="flex items-center gap-0.5">
                   <span className="w-1 h-4 bg-player-accent rounded-full animate-pulse" />
@@ -68,29 +70,42 @@ export const SearchResults = ({
               </Button>
             </div>
             
-            <div className="flex items-center gap-3 min-w-0">
-              <img
-                src={song.albumArt}
-                alt={song.album}
-                className="w-10 h-10 rounded object-cover bg-surface-3"
-              />
-              <div className="min-w-0">
-                <p className={`font-medium truncate ${isCurrentSong ? 'text-player-accent' : 'text-foreground'}`}>
+            {/* Album art and title */}
+            <div 
+              className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
+              onClick={() => onPlaySong(song, results)}
+            >
+              <div className="relative flex-shrink-0">
+                <img
+                  src={song.albumArt}
+                  alt={song.album}
+                  className="w-10 h-10 md:w-10 md:h-10 rounded object-cover bg-surface-3"
+                />
+                {/* Mobile play indicator */}
+                <div className="md:hidden absolute inset-0 flex items-center justify-center bg-black/40 rounded opacity-0 group-active:opacity-100">
+                  <Play className="w-4 h-4 text-white fill-current" />
+                </div>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className={`font-medium text-sm md:text-base truncate ${isCurrentSong ? 'text-player-accent' : 'text-foreground'}`}>
                   {song.title}
                 </p>
-                <p className="text-sm text-muted-foreground truncate">{song.artist}</p>
+                <p className="text-xs md:text-sm text-muted-foreground truncate">{song.artist}</p>
               </div>
             </div>
             
-            <div className="flex items-center">
+            {/* Album - Hidden on mobile */}
+            <div className="hidden md:flex items-center">
               <span className="text-sm text-muted-foreground truncate">{song.album}</span>
             </div>
             
-            <div className="flex items-center">
-              <span className="text-sm text-muted-foreground">{formatDuration(song.duration)}</span>
+            {/* Duration */}
+            <div className="flex items-center flex-shrink-0">
+              <span className="text-xs md:text-sm text-muted-foreground">{formatDuration(song.duration)}</span>
             </div>
             
-            <div className="flex items-center w-20">
+            {/* Actions */}
+            <div className="flex items-center w-8 md:w-20 justify-end">
               <Button
                 variant="ghost"
                 size="icon"

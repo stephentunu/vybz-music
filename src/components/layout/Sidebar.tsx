@@ -1,8 +1,11 @@
-import { Home, Search, Library, Heart, PlusCircle, Music2, Upload } from 'lucide-react';
+import { Home, Search, Library, Heart, PlusCircle, Music2, Upload, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Playlist } from '@/types/music';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useState } from 'react';
 
 interface SidebarProps {
   playlists: Playlist[];
@@ -18,16 +21,33 @@ const navItems = [
   { id: 'library', icon: Library, label: 'Your Library' },
 ];
 
-export const Sidebar = ({ playlists, activeView, onViewChange, onPlaylistSelect }: SidebarProps) => {
+const SidebarContent = ({ 
+  playlists, 
+  activeView, 
+  onViewChange, 
+  onPlaylistSelect,
+  onClose 
+}: SidebarProps & { onClose?: () => void }) => {
+  const handleNavClick = (viewId: string) => {
+    onViewChange(viewId);
+    onClose?.();
+  };
+
+  const handlePlaylistClick = (playlist: Playlist) => {
+    onViewChange(`playlist-${playlist.id}`);
+    onPlaylistSelect(playlist);
+    onClose?.();
+  };
+
   return (
-    <aside className="w-64 bg-sidebar h-full flex flex-col border-r border-sidebar-border">
+    <div className="h-full flex flex-col">
       {/* Logo */}
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-accent flex items-center justify-center shadow-glow">
             <Music2 className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="text-xl font-bold">Harmony</span>
+          <span className="text-xl font-bold">Vybz</span>
         </div>
       </div>
 
@@ -41,7 +61,7 @@ export const Sidebar = ({ playlists, activeView, onViewChange, onPlaylistSelect 
               'w-full justify-start gap-3 mb-1 text-muted-foreground hover:text-foreground',
               activeView === item.id && 'bg-sidebar-accent text-foreground'
             )}
-            onClick={() => onViewChange(item.id)}
+            onClick={() => handleNavClick(item.id)}
           >
             <item.icon className="h-5 w-5" />
             {item.label}
@@ -71,7 +91,7 @@ export const Sidebar = ({ playlists, activeView, onViewChange, onPlaylistSelect 
             'w-full justify-start gap-3 mb-2 text-muted-foreground hover:text-foreground',
             activeView === 'liked' && 'bg-sidebar-accent text-foreground'
           )}
-          onClick={() => onViewChange('liked')}
+          onClick={() => handleNavClick('liked')}
         >
           <div className="w-8 h-8 rounded bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
             <Heart className="h-4 w-4 text-white" fill="currentColor" />
@@ -90,10 +110,7 @@ export const Sidebar = ({ playlists, activeView, onViewChange, onPlaylistSelect 
                   'w-full justify-start gap-3 text-muted-foreground hover:text-foreground',
                   activeView === `playlist-${playlist.id}` && 'bg-sidebar-accent text-foreground'
                 )}
-                onClick={() => {
-                  onViewChange(`playlist-${playlist.id}`);
-                  onPlaylistSelect(playlist);
-                }}
+                onClick={() => handlePlaylistClick(playlist)}
               >
                 <div className="w-8 h-8 rounded overflow-hidden flex-shrink-0">
                   {playlist.coverArt ? (
@@ -124,6 +141,41 @@ export const Sidebar = ({ playlists, activeView, onViewChange, onPlaylistSelect 
           <span className="text-sm font-medium">User</span>
         </div>
       </div>
+    </div>
+  );
+};
+
+export const Sidebar = (props: SidebarProps) => {
+  const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
+
+  // Mobile: Use Sheet drawer
+  if (isMobile) {
+    return (
+      <>
+        {/* Mobile menu trigger - fixed in header area */}
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="fixed top-4 left-4 z-50 h-10 w-10 bg-surface-2/80 backdrop-blur-sm md:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-72 p-0 bg-sidebar border-r border-sidebar-border">
+            <SidebarContent {...props} onClose={() => setOpen(false)} />
+          </SheetContent>
+        </Sheet>
+      </>
+    );
+  }
+
+  // Desktop & Tablet: Regular sidebar
+  return (
+    <aside className="hidden md:flex w-64 lg:w-72 bg-sidebar h-full flex-col border-r border-sidebar-border flex-shrink-0">
+      <SidebarContent {...props} />
     </aside>
   );
 };

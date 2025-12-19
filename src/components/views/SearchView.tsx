@@ -6,6 +6,7 @@ import { searchTracks, getPopularTracks, getTracksByGenre } from '@/services/jam
 import { Loader2, TrendingUp, Music2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 interface SearchViewProps {
   onPlaySong: (song: Song, queue: Song[]) => void;
@@ -111,24 +112,50 @@ export const SearchView = ({ onPlaySong, onAddToQueue, currentSongId, isPlaying 
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6">
+    <div className="flex-1 overflow-y-auto p-4 md:p-6">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Search</h1>
-          <p className="text-muted-foreground">Enjoy your favorite music from Tunu's App</p>
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1 md:mb-2">Search</h1>
+          <p className="text-sm md:text-base text-muted-foreground">Enjoy your favorite music from Tunu's App</p>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <SearchBar onSearch={handleSearch} isLoading={isSearching} />
         </div>
 
-        {/* Genre buttons */}
-        <div className="mb-8">
-          <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+        {/* Genre buttons - Horizontally scrollable on mobile */}
+        <div className="mb-6 md:mb-8">
+          <h3 className="text-xs md:text-sm font-medium text-muted-foreground mb-2 md:mb-3 flex items-center gap-2">
             <Music2 className="w-4 h-4" />
             Browse by genre
           </h3>
-          <div className="flex flex-wrap gap-2">
+          
+          {/* Mobile: Horizontal scroll */}
+          <div className="md:hidden">
+            <ScrollArea className="w-full whitespace-nowrap">
+              <div className="flex gap-2 pb-2">
+                {GENRES.map(genre => (
+                  <Button
+                    key={genre}
+                    variant={selectedGenre === genre ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handleGenreClick(genre)}
+                    className={`rounded-full capitalize flex-shrink-0 ${
+                      selectedGenre === genre 
+                        ? 'bg-player-accent text-player-accent-foreground' 
+                        : 'border-border/50 hover:bg-surface-2'
+                    }`}
+                  >
+                    {genre}
+                  </Button>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+          
+          {/* Desktop: Wrap */}
+          <div className="hidden md:flex flex-wrap gap-2">
             {GENRES.map(genre => (
               <Button
                 key={genre}
@@ -148,12 +175,12 @@ export const SearchView = ({ onPlaySong, onAddToQueue, currentSongId, isPlaying 
         </div>
 
         {isSearching ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-8 h-8 animate-spin text-player-accent" />
+          <div className="flex items-center justify-center py-12 md:py-16">
+            <Loader2 className="w-6 h-6 md:w-8 md:h-8 animate-spin text-player-accent" />
           </div>
         ) : hasSearched ? (
           <div>
-            <h2 className="text-xl font-semibold text-foreground mb-4">
+            <h2 className="text-lg md:text-xl font-semibold text-foreground mb-3 md:mb-4">
               {selectedGenre ? `${selectedGenre.charAt(0).toUpperCase() + selectedGenre.slice(1)} Tracks` : 'Search Results'}
             </h2>
             <SearchResults
@@ -166,13 +193,13 @@ export const SearchView = ({ onPlaySong, onAddToQueue, currentSongId, isPlaying 
           </div>
         ) : (
           <div>
-            <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-player-accent" />
+            <h2 className="text-lg md:text-xl font-semibold text-foreground mb-3 md:mb-4 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-player-accent" />
               Popular This Week
             </h2>
             {isLoadingPopular ? (
-              <div className="flex items-center justify-center py-16">
-                <Loader2 className="w-8 h-8 animate-spin text-player-accent" />
+              <div className="flex items-center justify-center py-12 md:py-16">
+                <Loader2 className="w-6 h-6 md:w-8 md:h-8 animate-spin text-player-accent" />
               </div>
             ) : (
               <SearchResults
