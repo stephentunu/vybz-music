@@ -84,7 +84,8 @@ const Index = () => {
           recentSongs={popularTracks}
           currentSong={player.currentSong}
           isPlaying={player.isPlaying}
-          onPlaySong={(song) => handlePlaySong(song, popularTracks)}
+          onPlaySong={(song, queue) => handlePlaySong(song, queue || popularTracks)}
+          onAddToQueue={player.addToQueue}
           onPlaylistSelect={handlePlaylistSelect}
         />
       );

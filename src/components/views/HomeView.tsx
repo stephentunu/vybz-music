@@ -1,18 +1,44 @@
-import { Play } from 'lucide-react';
+import { useState } from 'react';
+import { Play, Music2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Song, Playlist } from '@/types/music';
 import { PlaylistCard } from '@/components/library/PlaylistCard';
 import { SongList } from '@/components/library/SongList';
+import { SearchResults } from '@/components/search/SearchResults';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { mockSongs } from '@/data/mockData';
+import { getTracksByGenre } from '@/services/jamendoApi';
+import { useToast } from '@/hooks/use-toast';
 
 interface HomeViewProps {
   playlists: Playlist[];
   recentSongs: Song[];
   currentSong: Song | null;
   isPlaying: boolean;
-  onPlaySong: (song: Song) => void;
+  onPlaySong: (song: Song, queue?: Song[]) => void;
+  onAddToQueue?: (song: Song) => void;
   onPlaylistSelect: (playlist: Playlist) => void;
 }
+
+const GENRES = [
+  'afro', 
+  'bongo flava', 
+  'swahili',
+  'african', 
+  'reggae', 
+  'gospel',
+  'rhumba',
+  'pop', 
+  'hiphop', 
+  'rock', 
+  'electronic', 
+  'jazz', 
+  'r&b', 
+  'latin', 
+  'folk',
+  'blues',
+  'country'
+];
 
 export const HomeView = ({
   playlists,
@@ -20,8 +46,14 @@ export const HomeView = ({
   currentSong,
   isPlaying,
   onPlaySong,
+  onAddToQueue,
   onPlaylistSelect,
 }: HomeViewProps) => {
+  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
+  const [genreTracks, setGenreTracks] = useState<Song[]>([]);
+  const [isLoadingGenre, setIsLoadingGenre] = useState(false);
+  const { toast } = useToast();
+
   const greeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
@@ -29,10 +61,108 @@ export const HomeView = ({
     return 'Good evening';
   };
 
+  const handleGenreClick = async (genre: string) => {
+    if (selectedGenre === genre) {
+      setSelectedGenre(null);
+      setGenreTracks([]);
+      return;
+    }
+    
+    setIsLoadingGenre(true);
+    setSelectedGenre(genre);
+    
+    try {
+      const results = await getTracksByGenre(genre, 30);
+      setGenreTracks(results);
+    } catch (error) {
+      console.error('Genre search failed:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load genre tracks. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoadingGenre(false);
+    }
+  };
+
   return (
     <div className="p-4 md:p-6 lg:p-8 animate-fade-in">
       {/* Greeting */}
       <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 md:mb-8">{greeting()}</h1>
+
+      {/* Genre Buttons Section */}
+      <section className="mb-8 md:mb-10">
+        <h3 className="text-sm md:text-base font-medium text-muted-foreground mb-3 flex items-center gap-2">
+          <Music2 className="w-4 h-4" />
+          Browse by genre
+        </h3>
+        
+        {/* Mobile: Horizontal scroll */}
+        <div className="md:hidden">
+          <ScrollArea className="w-full whitespace-nowrap">
+            <div className="flex gap-2 pb-2">
+              {GENRES.map(genre => (
+                <Button
+                  key={genre}
+                  variant={selectedGenre === genre ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleGenreClick(genre)}
+                  className={`rounded-full capitalize flex-shrink-0 ${
+                    selectedGenre === genre 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'border-border/50 hover:bg-surface-2'
+                  }`}
+                >
+                  {genre}
+                </Button>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
+        
+        {/* Desktop: Wrap */}
+        <div className="hidden md:flex flex-wrap gap-2">
+          {GENRES.map(genre => (
+            <Button
+              key={genre}
+              variant={selectedGenre === genre ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handleGenreClick(genre)}
+              className={`rounded-full capitalize ${
+                selectedGenre === genre 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'border-border/50 hover:bg-surface-2'
+              }`}
+            >
+              {genre}
+            </Button>
+          ))}
+        </div>
+      </section>
+
+      {/* Genre Results */}
+      {selectedGenre && (
+        <section className="mb-8 md:mb-10">
+          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 capitalize">
+            {selectedGenre} Tracks
+          </h2>
+          {isLoadingGenre ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 md:w-8 md:h-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <SearchResults
+              results={genreTracks}
+              onPlaySong={(song, queue) => onPlaySong(song, queue)}
+              onAddToQueue={onAddToQueue || (() => {})}
+              currentSongId={currentSong?.id}
+              isPlaying={isPlaying}
+            />
+          )}
+        </section>
+      )}
 
       {/* Quick Play Cards */}
       <section className="mb-8 md:mb-10">
