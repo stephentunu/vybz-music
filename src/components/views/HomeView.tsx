@@ -5,6 +5,7 @@ import { Song, Playlist } from '@/types/music';
 import { PlaylistCard } from '@/components/library/PlaylistCard';
 import { SongList } from '@/components/library/SongList';
 import { SearchResults } from '@/components/search/SearchResults';
+import { CommunityUploads } from '@/components/library/CommunityUploads';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { mockSongs } from '@/data/mockData';
 import { getTracksByGenre } from '@/services/jamendoApi';
@@ -163,6 +164,13 @@ export const HomeView = ({
           )}
         </section>
       )}
+
+      {/* Community Uploads */}
+      <CommunityUploads
+        onPlaySong={onPlaySong}
+        currentSong={currentSong}
+        isPlaying={isPlaying}
+      />
 
       {/* Quick Play Cards */}
       <section className="mb-8 md:mb-10">
